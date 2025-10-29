@@ -1,0 +1,20 @@
+@inherits LayoutComponentBase
+
+<div class="layout">
+ <header>
+ <CiOHomePage.Client.Shared.NavMenu />
+ </header>
+ <main>
+ @Body
+ </main>
+ <footer class="footer container mt-8">
+ <hr />
+ <small>&copy; @DateTime.UtcNow.Year Cursed into Oblivion</small>
+ </footer>
+</div>
+
+<style>
+.layout main{ min-height: calc(100vh -160px); }
+.layout header{ position:sticky; top:0; backdrop-filter: blur(6px); background: rgba(10,10,10,.65); z-index:10; }
+.footer{ color:#9a9a9a; }
+</style>

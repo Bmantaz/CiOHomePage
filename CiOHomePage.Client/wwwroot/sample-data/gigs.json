@@ -1,0 +1,26 @@
+[
+ {
+ "Id":1,
+ "Date": "2025-11-08T20:00:00Z",
+ "Venue": "The Black Forge",
+ "City": "Copenhagen",
+ "TicketUrl": "https://tickets.example.com/cio-cph",
+ "IsSoldOut": false
+ },
+ {
+ "Id":2,
+ "Date": "2025-12-12T21:00:00Z",
+ "Venue": "Rust & Ruin",
+ "City": "Aarhus",
+ "TicketUrl": null,
+ "IsSoldOut": true
+ },
+ {
+ "Id":3,
+ "Date": "2026-01-24T20:30:00Z",
+ "Venue": "Oblivion Hall",
+ "City": "Odense",
+ "TicketUrl": "https://tickets.example.com/cio-odense",
+ "IsSoldOut": false
+ }
+]

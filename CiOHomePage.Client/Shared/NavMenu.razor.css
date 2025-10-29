@@ -1,0 +1,8 @@
+.cio-nav { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem1.25rem; border-bottom:1px solid rgba(255,255,255,.08); }
+.cio-nav__brand { font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.cio-logo { color:#eaeaea; text-decoration:none; }
+.cio-nav__toggle { display:none; background:none; border:1px solid #333; color:#eaeaea; padding:.25rem .5rem; }
+.cio-nav__links { list-style:none; display:flex; gap:1rem; margin:0; padding:0; }
+.cio-nav__links a { color:#cfcfcf; text-decoration:none; padding:.25rem .5rem; border-radius:2px; }
+.cio-nav__links a.active { color:#eaeaea; background:rgba(255,255,255,.06); }
+@media (max-width:720px){ .cio-nav { flex-wrap:wrap; } .cio-nav__toggle { display:inline-block; } .cio-nav__links { width:100%; display:none; flex-direction:column; gap:.5rem; margin-top:.5rem; } .cio-nav.open .cio-nav__links { display:flex; } }

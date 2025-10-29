@@ -1,0 +1,84 @@
+@page "/merch"
+@inject IMerchService MerchSvc
+
+<PageTitle>Merch - Cursed into Oblivion</PageTitle>
+
+<div class="container">
+ <h1>Merch</h1>
+
+ <section class="mt-4">
+ <EditForm Model="form" OnValidSubmit="AddSale">
+ <DataAnnotationsValidator />
+ <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.5rem;">
+ <InputText class="input" @bind-Value="form.ItemName" placeholder="Item name" />
+ <InputText class="input" @bind-Value="form.Category" placeholder="Category" />
+ <InputNumber class="input" @bind-Value="form.Quantity" />
+ <InputNumber class="input" @bind-Value="form.SalePrice" />
+ <InputDate @bind-Value="form.DateSold" class="input" />
+ <button class="btn" type="submit">Log sale</button>
+ </div>
+ </EditForm>
+ </section>
+
+ <section class="mt-8">
+ <h2>Summary</h2>
+ @if (summary is null)
+ {
+ <p style="color:var(--muted)">Loading...</p>
+ }
+ else
+ {
+ <p><strong>Total revenue:</strong> @summary.Value.revenue:C</p>
+ <ul>
+ @foreach (var t in summary.Value.top)
+ {
+ <li>@t.item (@t.qty)</li>
+ }
+ </ul>
+ }
+ </section>
+
+ <section class="mt-8">
+ <h2>Recent sales</h2>
+ <ul>
+ @foreach (var s in sales)
+ {
+ <li>@s.DateSold:d - @s.ItemName (@s.Category) x@s.Quantity @("x " + s.SalePrice.ToString("C"))</li>
+ }
+ </ul>
+ </section>
+</div>
+
+@code {
+ private class MerchForm
+ {
+ public string ItemName { get; set; } = "T-Shirt";
+ public string Category { get; set; } = "Shirt";
+ public int Quantity { get; set; } =1;
+ public decimal SalePrice { get; set; } =20m;
+ public DateTime DateSold { get; set; } = DateTime.Today;
+ }
+
+ private MerchForm form = new();
+ private List<MerchSaleDto> sales = new();
+ private (decimal revenue, IReadOnlyList<(string item,int qty)> top)? summary;
+
+ protected override async Task OnInitializedAsync()
+ {
+ await Load();
+ }
+
+ private async Task Load()
+ {
+ sales = (await MerchSvc.GetAllAsync()).ToList();
+ summary = await MerchSvc.GetSummaryAsync();
+ }
+
+ private async Task AddSale()
+ {
+ var dto = new MerchSaleDto(0, form.ItemName, form.Category, form.Quantity, form.SalePrice, form.DateSold);
+ await MerchSvc.CreateAsync(dto);
+ form = new();
+ await Load();
+ }
+}

@@ -1,0 +1,53 @@
+@page "/files"
+@attribute [Authorize]
+@inject NavigationManager Nav
+
+<PageTitle>Files</PageTitle>
+
+<div class="container">
+ <h1>Files</h1>
+ <p class="mt-2" style="color:var(--muted)">Connect your drive and browse shared files.</p>
+ <div class="mt-4">
+ <a class="btn" href="api/files/auth/google">Connect to Google Drive</a>
+ <a class="btn" style="margin-left:.5rem" href="api/files/auth/dropbox">Connect to Dropbox</a>
+ <button class="btn" style="margin-left:.5rem" @onclick="Load">Refresh</button>
+ </div>
+
+ <section class="mt-6">
+ <h3>Your files</h3>
+ @if (items is null)
+ {
+ <p style="color:var(--muted)">Click Refresh to load file list.</p>
+ }
+ else if (items.Count ==0)
+ {
+ <p style="color:var(--muted)">No files</p>
+ }
+ else
+ {
+ <ul>
+ @foreach (var f in items)
+ {
+ <li><strong>@f.Name</strong> <small style="color:var(--muted)">@f.MimeType (@f.Size) - @f.ModifiedUtc</small></li>
+ }
+ </ul>
+ }
+ </section>
+</div>
+
+@code {
+ private List<FileItem> items = new();
+ private HttpClient Http => new HttpClient{ BaseAddress = new Uri(Nav.BaseUri) };
+
+ protected override async Task OnInitializedAsync()
+ {
+ await Load();
+ }
+
+ private async Task Load()
+ {
+ items = await Http.GetFromJsonAsync<List<FileItem>>("api/files/list?provider=mock") ?? new();
+ }
+
+ private sealed class FileItem { public string Id { get; set; } = string.Empty; public string Name { get; set; } = string.Empty; public string? MimeType { get; set; } public long? Size { get; set; } public DateTime? ModifiedUtc { get; set; } }
+}

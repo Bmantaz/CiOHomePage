@@ -1,0 +1,73 @@
+@page "/gigs"
+@using CiOHomePage.Client.Models
+@inject CiOHomePage.Client.Services.IGigService GigsService
+
+<PageTitle>Gigs - Cursed into Oblivion</PageTitle>
+
+<div class="container">
+ <h1>Gigs</h1>
+
+ @if (loading)
+ {
+ <p style="color:var(--muted)">Loading gigs...</p>
+ }
+ else if (!string.IsNullOrWhiteSpace(error))
+ {
+ <p style="color:#ff6b6b">@error</p>
+ }
+ else if (gigs is null || gigs.Count ==0)
+ {
+ <p style="color:var(--muted)">No upcoming shows.</p>
+ }
+ else
+ {
+ <ul class="gig-list">
+ @foreach (var g in gigs)
+ {
+ <li class="gig">
+ <div class="gig__date">
+ <div class="gig__day">@g.Date.ToLocalTime().ToString("dd")</div>
+ <div class="gig__month">@g.Date.ToLocalTime().ToString("MMM").ToUpper()</div>
+ <div class="gig__year">@g.Date.ToLocalTime().ToString("yyyy")</div>
+ </div>
+ <div class="gig__details">
+ <div class="gig__venue">@g.Venue</div>
+ <div class="gig__city">@g.City</div>
+ </div>
+ <div class="gig__actions">
+ @if (g.IsSoldOut)
+ {
+ <span class="badge badge-sold">Sold Out</span>
+ }
+ else if (!string.IsNullOrWhiteSpace(g.TicketUrl))
+ {
+ <a class="btn" href="@g.TicketUrl" target="_blank" rel="noopener">Tickets</a>
+ }
+ </div>
+ </li>
+ }
+ </ul>
+ }
+</div>
+
+@code {
+ private List<Gig> gigs = new();
+ private bool loading = true;
+ private string? error;
+
+ protected override async Task OnInitializedAsync()
+ {
+ try
+ {
+ gigs = (await GigsService.GetUpcomingAsync()).ToList();
+ }
+ catch (Exception ex)
+ {
+ error = $"Failed to load gigs: {ex.Message}";
+ }
+ finally
+ {
+ loading = false;
+ }
+ }
+}

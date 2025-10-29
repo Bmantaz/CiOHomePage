@@ -1,0 +1,121 @@
+@page "/members/calendar"
+@attribute [Authorize]
+@inject ICalendarService CalendarService
+@inject IBandAuthService Auth
+@inject AuthenticationStateProvider AuthState
+@using Microsoft.AspNetCore.Components.Authorization
+
+<PageTitle>Band Calendar</PageTitle>
+
+<div class="container">
+ <h1>Band Calendar</h1>
+
+ <AuthorizeView Roles="BandMember">
+ <Authorized>
+ <section class="mt-4">
+ <button class="btn" @onclick="NewPractice">+ Practice</button>
+ <button class="btn" @onclick="NewGig" style="margin-left:.5rem">+ Gig</button>
+ <button class="btn" @onclick="NewStudio" style="margin-left:.5rem">+ Studio</button>
+ <button class="btn" @onclick="Logout" style="margin-left:.5rem">Logout</button>
+ </section>
+
+ <section class="mt-8">
+ @if (entries.Count ==0)
+ {
+ <p style="color:var(--muted)">No entries yet. Create one above.</p>
+ }
+ else
+ {
+ <ul class="gig-list">
+ @foreach (var e in entries)
+ {
+ <li class="gig">
+ <div class="gig__date">
+ <div class="gig__day">@e.Start.ToLocalTime().ToString("dd")</div>
+ <div class="gig__month">@e.Start.ToLocalTime().ToString("MMM").ToUpper()</div>
+ <div class="gig__year">@e.Start.ToLocalTime().ToString("yyyy")</div>
+ </div>
+ <div class="gig__details">
+ <div class="gig__venue">@e.Title (@e.Type)</div>
+ <div class="gig__city">@((e.Start.ToLocalTime()).ToString("HH:mm")) - @((e.End.ToLocalTime()).ToString("HH:mm")) @if (!string.IsNullOrWhiteSpace(e.Location)) {<text>- @e.Location</text>}</div>
+ <div class="gig__city" style="white-space:pre-wrap">@e.Notes</div>
+ </div>
+ <div class="gig__actions">
+ <button class="btn" @onclick="() => Edit(e)">Edit</button>
+ <button class="btn" @onclick="() => Remove(e.Id)">Delete</button>
+ </div>
+ </li>
+ }
+ </ul>
+ }
+ </section>
+ </Authorized>
+ <NotAuthorized>
+ <p style="color:var(--muted)">You need to log in to view the band calendar.</p>
+ <a class="btn" href="/account/login">Log in</a>
+ </NotAuthorized>
+ </AuthorizeView>
+</div>
+
+@if (isDialogOpen)
+{
+ <div class="container" style="max-width:640px;">
+ <h2>@(editing?.Id is null ? "New Entry" : "Edit Entry")</h2>
+ <EditForm Model="editing" OnValidSubmit="Save">
+ <DataAnnotationsValidator />
+ <div class="mt-4">
+ <label>Title</label>
+ <InputText class="input" @bind-Value="editing!.Title" />
+ </div>
+ <div class="mt-4">
+ <label>Type</label>
+ <InputSelect class="input" @bind-Value="editing!.Type">
+ <option>Practice</option>
+ <option>Gig</option>
+ <option>Studio</option>
+ </InputSelect>
+ </div>
+ <div class="mt-4">
+ <label>Start</label>
+ <InputDate @bind-Value="editing!.Start" class="input" />
+ </div>
+ <div class="mt-4">
+ <label>End</label>
+ <InputDate @bind-Value="editing!.End" class="input" />
+ </div>
+ <div class="mt-4">
+ <label>Location</label>
+ <InputText class="input" @bind-Value="editing!.Location" />
+ </div>
+ <div class="mt-4">
+ <label>Notes</label>
+ <InputTextArea class="input" @bind-Value="editing!.Notes" rows="4" />
+ </div>
+ <div class="mt-8">
+ <button class="btn" type="submit">Save</button>
+ <button class="btn" type="button" @onclick="Cancel" style="margin-left:.5rem;">Cancel</button>
+ </div>
+ </EditForm>
+ </div>
+}
+
+@code {
+ private List<CalendarEntry> entries = new();
+ private CalendarEntry? editing;
+ private bool isDialogOpen;
+
+ protected override async Task OnInitializedAsync()
+ {
+ entries = (await CalendarService.GetEntriesAsync()).ToList();
+ }
+
+ private void NewPractice() => Open(new CalendarEntry{ Title = "Practice", Type = "Practice", Start = DateTime.Today, End = DateTime.Today.AddHours(2)});
+ private void NewGig() => Open(new CalendarEntry{ Title = "Gig", Type = "Gig", Start = DateTime.Today, End = DateTime.Today.AddHours(3)});
+ private void NewStudio() => Open(new CalendarEntry{ Title = "Studio", Type = "Studio", Start = DateTime.Today, End = DateTime.Today.AddHours(4)});
+ private void Edit(CalendarEntry e) => Open(new CalendarEntry{ Id = e.Id, Title = e.Title, Type = e.Type, Start = e.Start, End = e.End, Location = e.Location, Notes = e.Notes });
+ private void Open(CalendarEntry e){ editing = e; isDialogOpen = true; }
+ private void Cancel(){ editing = null; isDialogOpen = false; }
+ private async Task Save(){ if (editing is null) return; await CalendarService.AddOrUpdateAsync(editing); entries = (await CalendarService.GetEntriesAsync()).ToList(); isDialogOpen = false; }
+ private async Task Remove(Guid id){ await CalendarService.DeleteAsync(id); entries = (await CalendarService.GetEntriesAsync()).ToList(); }
+ private async Task Logout(){ await Auth.LogoutAsync(); if (AuthState is BandAuthStateProvider p) p.NotifyAuthStateChanged(); }
+}

@@ -1,0 +1,64 @@
+@page "/account/login"
+@inject CiOHomePage.Client.Authentication.IBandAuthService Auth
+@inject Microsoft.AspNetCore.Components.NavigationManager Nav
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthStateProvider
+
+@code{
+ [Parameter, SupplyParameterFromQuery] public string? returnUrl { get; set; }
+}
+
+<PageTitle>Login</PageTitle>
+
+<div class="container" style="max-width:520px;">
+ <h1>Band Login</h1>
+
+ @if (!string.IsNullOrEmpty(error))
+ {
+ <p style="color:#ff6b6b">@error</p>
+ }
+
+ <EditForm Model="model" OnValidSubmit="HandleLogin">
+ <DataAnnotationsValidator />
+ <div class="mt-4">
+ <label>Username</label>
+ <InputText class="input" @bind-Value="model.Username" />
+ </div>
+ <div class="mt-4">
+ <label>Password</label>
+ <InputText class="input" @bind-Value="model.Password" type="password" />
+ </div>
+ <div class="mt-4">
+ <label><InputCheckbox @bind-Value="model.RememberMe" /> Remember me</label>
+ </div>
+ <div class="mt-8">
+ <button class="btn" type="submit">Sign in</button>
+ </div>
+ </EditForm>
+</div>
+
+@code {
+ private string? error;
+ private LoginModel model = new();
+
+ private async Task HandleLogin()
+ {
+ var ok = await Auth.LoginAsync(model.Username, model.Password, model.RememberMe);
+ if (!ok)
+ {
+ error = "Invalid credentials";
+ return;
+ }
+ if (AuthStateProvider is CiOHomePage.Client.Authentication.BandAuthStateProvider p)
+ {
+ p.NotifyAuthStateChanged();
+ }
+ Nav.NavigateTo(string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl!);
+ }
+
+ private sealed class LoginModel
+ {
+ public string Username { get; set; } = string.Empty;
+ public string Password { get; set; } = string.Empty;
+ public bool RememberMe { get; set; }
+ }
+}

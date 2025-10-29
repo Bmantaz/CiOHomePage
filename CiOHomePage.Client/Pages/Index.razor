@@ -1,0 +1,120 @@
+@page "/"
+@using CiOHomePage.Client.Models
+@inject CiOHomePage.Client.Services.IGigService GigsService
+@inject NavigationManager Nav
+
+<PageTitle>Cursed into Oblivion - Debut Album "LIFE"</PageTitle>
+
+<section class="hero-section">
+    <div class="hero-placeholder">
+        </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">Cursed into Oblivion</h1>
+        <h2 class="hero-subtitle">Debut Album: LIFE</h2>
+        <a href="#listen" class="btn btn-primary hero-cta">Listen Now</a>
+    </div>
+</section>
+
+<section id="listen" class="container mt-8">
+    <div class="album-section">
+        <div class="album-description">
+            <h2>Debut Album: LIFE</h2>
+            <p class="lead-text">
+                Danish metalcore band Cursed Into Oblivion has released their debut album, LIFE. The band combines modern metalcore with classic thrash metal, incorporating elements from both classical and electronic music...
+            </p>
+            <div class="album-cover-placeholder">
+                <p>Album Cover Placeholder</p>
+            </div>
+        </div>
+
+        <div class="album-embed">
+            <iframe style="border-radius:12px; border:0; width:100%; min-height:352px;"
+                    src="https://open.spotify.com/artist/0UHWo7NpNBWTomTYIBS340"
+                    allowfullscreen
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"></iframe>
+        </div>
+    </div>
+</section>
+
+<section class="container mt-8 text-center">
+    <h2>A Musical Journey</h2>
+    <p class="mt-2" style="color:var(--muted); max-width:70ch; margin:0 auto;">
+        The album takes the listener on a journey through powerful guitar riffs, energetic drum patterns, and dynamic vocal variations...
+    </p>
+
+    <div class="image-grid mt-6">
+        <div class="image-placeholder-square">(Image Placeholder)</div>
+        <div class="image-placeholder-square">(Image Placeholder)</div>
+        <div class="image-placeholder-square">(Image Placeholder)</div>
+    </div>
+</section>
+
+<section class="container mt-8">
+    <div class="about-band-section">
+        <div class="about-text">
+            <h3>An Experimental Sonic Universe</h3>
+            <p>With LIFE, Cursed Into Oblivion explores not only the raw and heavy sides of metal genres but also integrates classical and electronic elements to craft a soundscape that stands out...</p>
+
+            <h3 class="mt-4">Self-Produced and Passion-Driven Work</h3>
+            <p>The album was written with passion over the course of a year and is 100% self-produced by the three members. With 11 tracks, LIFE marks a major milestone for the band...</p>
+        </div>
+        <div class="about-image-placeholder">
+            (Placeholder for band photo, "in studio" etc.)
+        </div>
+    </div>
+</section>
+
+<section class="container mt-8">
+    <div class="text-center">
+        <h2>Ready for the Stage</h2>
+        <p class="mt-2" style="color:var(--muted); max-width:70ch; margin:0 auto;">
+            With this debut album, Cursed Into Oblivion is ready to take the music scene by storm and cement their place as one of the most exciting new acts in the metal world.
+        </p>
+    </div>
+
+    @if (upcomingGigs is null)
+    {
+        <p class="mt-4 text-center" style="color:var(--muted)">Loading...</p>
+    }
+    else if (!upcomingGigs.Any())
+    {
+        <p class="mt-4 text-center" style="color:var(--muted)">No upcoming shows. Check back soon.</p>
+    }
+    else
+    {
+        <ul class="gig-list-minimal mt-6">
+            @foreach (var gig in upcomingGigs)
+            {
+                <li class="gig-item" @onclick="GoGigs">
+                    <span class="gig-date">@gig.Date.ToString("MMM dd")</span>
+                    <span class="gig-venue">@gig.Venue</span>
+                    <span class="gig-city">@gig.City</span>
+                </li>
+            }
+        </ul>
+        <div class="mt-4 text-center">
+            <a href="/gigs" class="btn">All Gigs</a>
+        </div>
+    }
+</section>
+
+@code {
+    private List<Gig>? upcomingGigs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var allGigs = await GigsService.GetUpcomingAsync();
+            upcomingGigs = allGigs.Take(3).ToList();
+        }
+        catch
+        {
+            upcomingGigs = new List<Gig>();
+        }
+    }
+
+    private void GoGigs() => Nav.NavigateTo("/gigs");
+}

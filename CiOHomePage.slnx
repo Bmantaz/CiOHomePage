@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CiOHomePage.Client/CiOHomePage.Client.csproj" />
+  <Project Path="CiOHomePage.Server/CiOHomePage.Server.csproj" />
+</Solution>

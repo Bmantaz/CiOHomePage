@@ -1,0 +1,127 @@
+@page "/members/dashboard"
+@attribute [Authorize]
+@inject ICalendarService CalendarService
+@inject IMerchService Merch
+@inject NavigationManager Nav
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="container">
+ <h1>Band Dashboard</h1>
+
+ <section class="mt-6 grid" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:1rem;">
+ <div class="card">
+ <h3>Upcoming</h3>
+ @if (next3 is null)
+ {
+ <p style="color:var(--muted)">Loading...</p>
+ }
+ else if (next3.Count ==0)
+ {
+ <p style="color:var(--muted)">No upcoming events</p>
+ }
+ else
+ {
+ <ul>
+ @foreach (var e in next3)
+ {
+ <li><strong>@e.Title</strong> - @e.Start.ToLocalTime():g (@e.Type)</li>
+ }
+ </ul>
+ }
+ <button class="btn" @onclick="GoCalendar">Open Calendar</button>
+ </div>
+
+ <div class="card">
+ <h3>Merch Summary</h3>
+ @if (summary is null)
+ {
+ <p style="color:var(--muted)">Loading...</p>
+ }
+ else
+ {
+ <p><strong>Total revenue:</strong> @summary.Value.revenue:C</p>
+ <ul>
+ @foreach (var t in summary.Value.top)
+ {
+ <li>@t.item (@t.qty)</li>
+ }
+ </ul>
+ }
+ </div>
+
+ <div class="card">
+ <h3>Quick Links</h3>
+ <div class="mt-2">
+ <button class="btn" @onclick="GoGigs">Gigs</button>
+ <button class="btn" style="margin-left:.5rem" @onclick="GoCalendar">Calendar</button>
+ </div>
+ </div>
+ </section>
+
+ <section class="mt-8">
+ <h2>Log Merch Sale</h2>
+ <EditForm Model="form" OnValidSubmit="AddSale">
+ <DataAnnotationsValidator />
+ <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.5rem;">
+ <InputText class="input" @bind-Value="form.ItemName" placeholder="Item name" />
+ <InputText class="input" @bind-Value="form.Category" placeholder="Category" />
+ <InputNumber class="input" @bind-Value="form.Quantity" />
+ <InputNumber class="input" @bind-Value="form.SalePrice" />
+ <InputDate class="input" @bind-Value="form.DateSold" />
+ <button class="btn" type="submit">Log sale</button>
+ </div>
+ </EditForm>
+ </section>
+
+ <section class="mt-8">
+ <h2>Recent sales</h2>
+ <ul>
+ @foreach (var s in sales)
+ {
+ <li>@s.DateSold:d - @s.ItemName (@s.Category) x@s.Quantity @("x " + s.SalePrice.ToString("C"))</li>
+ }
+ </ul>
+ </section>
+</div>
+
+@code {
+ private List<CalendarEntry>? next3;
+ private (decimal revenue, IReadOnlyList<(string item, int qty)> top)? summary;
+
+ private class MerchForm
+ {
+ public string ItemName { get; set; } = "T-Shirt";
+ public string Category { get; set; } = "Shirt";
+ public int Quantity { get; set; } =1;
+ public decimal SalePrice { get; set; } =20m;
+ public DateTime DateSold { get; set; } = DateTime.Today;
+ }
+
+ private MerchForm form = new();
+ private List<MerchSaleDto> sales = new();
+
+ protected override async Task OnInitializedAsync()
+ {
+ var events = await CalendarService.GetEntriesAsync();
+ next3 = events.OrderBy(e => e.Start).Take(3).ToList();
+ await LoadMerch();
+ }
+
+ private async Task LoadMerch()
+ {
+ sales = (await Merch.GetAllAsync()).ToList();
+ summary = await Merch.GetSummaryAsync();
+ }
+
+ private async Task AddSale()
+ {
+ var dto = new MerchSaleDto(0, form.ItemName, form.Category, form.Quantity, form.SalePrice, form.DateSold);
+ await Merch.CreateAsync(dto);
+ form = new();
+ await LoadMerch();
+ }
+
+ private void GoCalendar() => Nav.NavigateTo("/members/calendar");
+ private void GoGigs() => Nav.NavigateTo("/gigs");
+}

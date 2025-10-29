@@ -1,0 +1,18 @@
+@using CiOHomePage.Client.Shared
+
+<CascadingAuthenticationState>
+ <Router AppAssembly="typeof(Program).Assembly" PreferExactMatches="true">
+ <Found Context="routeData">
+ <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(CiOHomePage.Client.Shared.MainLayout)">
+ <NotAuthorized>
+ <RedirectToLogin />
+ </NotAuthorized>
+ </AuthorizeRouteView>
+ </Found>
+ <NotFound>
+ <LayoutView Layout="typeof(CiOHomePage.Client.Shared.MainLayout)">
+ <CiOHomePage.Client.Pages.NotFound />
+ </LayoutView>
+ </NotFound>
+ </Router>
+</CascadingAuthenticationState>

@@ -1,0 +1,118 @@
+/* Global dark theme for Cursed into Oblivion */
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Inter:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Montserrat:wght@900&family=Poppins:wght@900&display=swap');
+
+:root{
+ --bg:#0a0a0a;
+ --fg:#eaeaea;
+ --muted:#b8b8b8;
+ --accent:#5a0a0a; /* deep subdued red */
+ --surface:#141414;
+ --border:rgba(255,255,255,.06);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+html{ scroll-behavior:smooth; }
+body{
+ margin:0; background:var(--bg); color:var(--fg);
+ font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+ line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+
+h1,h2,h3,h4,h5,h6{
+ font-family:'UnifrakturCook', serif; letter-spacing:.5px; margin:00 .5rem0;
+}
+h1, h2, h3, .hero-title, .cio-nav__brand {
+ font-family: 'Oswald', sans-serif;
+ font-weight:700;
+ letter-spacing: .08em;
+ text-transform: uppercase;
+}
+
+a{ color:#d6d6d6; text-decoration:none; }
+a:hover{ color:var(--fg); }
+
+img{ max-width:100%; display:block; }
+
+.container{ max-width:1100px; margin:0 auto; padding:1.25rem; }
+
+.header-hero{
+ min-height:60vh; display:grid; place-items:center; text-align:center;
+ background:
+ radial-gradient(1000px400px at50% -10%, rgba(255,255,255,.05), transparent60%),
+ linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)30%);
+ border-bottom:1px solid var(--border);
+}
+
+.btn{
+ display:inline-block; padding:.6rem1rem; border:1px solid var(--border); border-radius:2px;
+ background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--fg);
+}
+.btn:hover{ border-color:#777; }
+
+.badge{ display:inline-block; padding:.3rem .5rem; border:1px solid var(--border); border-radius:2px; }
+.badge-sold{ background:rgba(128,0,0,.2); border-color:#7a1a1a; color:#ffb3b3; text-transform:uppercase; font-size:.8rem; letter-spacing:.06em; }
+
+hr{ border:0; border-top:1px solid var(--border); margin:1.5rem0; }
+
+/* Utilities */
+.mt-2{ margin-top:.5rem; } .mt-4{ margin-top:1rem; } .mt-8{ margin-top:2rem; } .mt-6{ margin-top:1.5rem; }
+.text-center{ text-align:center; }
+
+/* Gigs list */
+.gig-list{ list-style:none; margin:1rem000; padding:0; display:flex; flex-direction:column; gap:.75rem; }
+.gig{ display:grid; grid-template-columns:90px1fr auto; gap:1rem; align-items:center; padding:.9rem1rem; background:var(--surface); border:1px solid var(--border); border-radius:4px; }
+.gig__date{ text-align:center; line-height:1; }
+.gig__day{ font-size:1.6rem; font-weight:700; }
+.gig__month{ color:var(--muted); font-size:.85rem; }
+.gig__year{ color:#777; font-size:.8rem; }
+.gig__venue{ font-weight:600; }
+.gig__city{ color:var(--muted); }
+.gig__actions{ display:flex; gap:.5rem; }
+@media (max-width:640px){ .gig{ grid-template-columns:70px1fr; } .gig__actions{ grid-column:1 / -1; } }
+
+/* Merch grid */
+.merch-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:1rem; }
+.merch-card{ display:block; background:var(--surface); border:1px solid var(--border); border-radius:4px; overflow:hidden; color:var(--fg); }
+.merch-card img{ width:100%; aspect-ratio:1/1; object-fit:cover; filter:contrast(95%); }
+.merch-card__info{ display:flex; flex-direction:column; gap:.25rem; padding:.75rem; }
+.merch-card:hover{ border-color:#777; }
+
+/* HERO (cinematic) */
+.hero-section { position: relative; height:80vh; min-height:500px; width:100%; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; background:#050505; }
+.hero-placeholder { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:100%; padding-top:56.25%; background:#111; z-index:1; opacity:.5; }
+.hero-overlay { position:absolute; inset:0; background:linear-gradient(0deg, rgba(10,10,10,.8)0%, rgba(10,10,10,.4)100%); z-index:2; }
+.hero-content { position:relative; z-index:3; color:#eaeaea; padding:1rem; }
+.hero-title { font-size: clamp(2.5rem,8vw,5rem); margin:00 .5rem0; text-shadow:0015px rgba(0,0,0,.7); }
+.hero-subtitle { font-size: clamp(1.5rem,4vw,2.5rem); margin:0; color:#ccc; }
+.hero-cta { margin-top:2rem; font-size:1.1rem; padding:.75rem1.5rem; }
+
+/* Album section */
+.album-section { display:grid; grid-template-columns:1fr1fr; gap:2rem; align-items:center; }
+.lead-text { font-size:1.1rem; color:#cfcfcf; }
+.album-cover-placeholder { width:100%; max-width:300px; aspect-ratio:1/1; background:#222; color:#666; display:flex; align-items:center; justify-content:center; border-radius:8px; margin-top:1.5rem; }
+
+/* Image grid */
+.image-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:1rem; }
+.image-placeholder-square { width:100%; aspect-ratio:1/1; background:#222; color:#666; display:flex; align-items:center; justify-content:center; border-radius:4px; }
+
+/* About band */
+.about-band-section { display:grid; grid-template-columns:2fr1fr; gap:2rem; align-items:center; }
+.about-image-placeholder { width:100%; aspect-ratio:3/4; background:#222; color:#666; display:flex; align-items:center; justify-content:center; border-radius:4px; }
+
+/* Minimal gig list */
+.gig-list-minimal { list-style:none; padding:0; margin:0; border-top:1px solid #333; }
+.gig-item { display:grid; grid-template-columns:1fr2fr1fr; gap:1rem; padding:1.5rem1rem; border-bottom:1px solid #333; transition:background-color .2s ease; cursor:pointer; }
+.gig-item:hover { background: rgba(255,255,255,.05); }
+.gig-date { font-size:1.1rem; font-weight:700; color:#fff; }
+.gig-venue { font-size:1rem; color:#cfcfcf; }
+.gig-city { font-size:1rem; color:#888; text-align:right; }
+@media (max-width:600px){ .gig-item{ grid-template-columns:1fr; gap:.25rem; text-align:center; } .gig-city{text-align:center;} }
+
+/* Responsive adjustments */
+@media (max-width:800px){
+ .album-section, .about-band-section { grid-template-columns:1fr; }
+ .album-embed { order:-1; }
+ .about-image-placeholder { aspect-ratio:16/9; }
+}
