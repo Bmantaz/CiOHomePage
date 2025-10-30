@@ -41,6 +41,13 @@ builder.Services.AddHttpClient<MerchService>(client =>
 })
 .AddHttpMessageHandler<AuthMessageHandler>();
 
+// Gig service uses API base and includes auth for POST endpoints
+builder.Services.AddHttpClient<IGigService, GigService>(client =>
+{
+ client.BaseAddress = new Uri(apiBase);
+})
+.AddHttpMessageHandler<AuthMessageHandler>();
+
 // AuthN/AuthZ
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, BandAuthStateProvider>();
@@ -50,7 +57,6 @@ builder.Services.AddScoped<IBandAuthService>(sp => sp.GetRequiredService<JwtBand
 builder.Services.AddScoped<ILocalStorage, BrowserLocalStorage>();
 
 // App services
-builder.Services.AddScoped<IGigService, GigService>();
 builder.Services.AddScoped<ICalendarService>(sp => sp.GetRequiredService<HttpCalendarService>());
 builder.Services.AddScoped<IMerchService>(sp => sp.GetRequiredService<MerchService>());
 

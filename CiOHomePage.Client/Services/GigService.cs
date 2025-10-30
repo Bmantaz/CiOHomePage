@@ -9,11 +9,16 @@ public class GigService(HttpClient http) : IGigService
 
  public async Task<IReadOnlyList<Gig>> GetUpcomingAsync(CancellationToken cancellationToken = default)
  {
- var data = await _http.GetFromJsonAsync<List<Gig>>("sample-data/gigs.json", cancellationToken) ?? [];
- var now = DateTime.UtcNow.Date;
+ var data = await _http.GetFromJsonAsync<List<Gig>>("api/gigs", cancellationToken) ?? [];
  return data
- .Where(x => x.Date.Date >= now)
  .OrderBy(x => x.Date)
  .ToList();
+ }
+
+ public async Task<Gig?> CreateAsync(Gig gig, CancellationToken cancellationToken = default)
+ {
+ var resp = await _http.PostAsJsonAsync("api/gigs", gig, cancellationToken);
+ if (!resp.IsSuccessStatusCode) return null;
+ return await resp.Content.ReadFromJsonAsync<Gig>(cancellationToken: cancellationToken);
  }
 }

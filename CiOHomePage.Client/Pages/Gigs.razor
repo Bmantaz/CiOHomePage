@@ -63,7 +63,8 @@
  }
  catch (Exception ex)
  {
- error = $"Failed to load gigs: {ex.Message}";
+ Console.WriteLine(ex);
+ error = "An error occurred while loading gigs. Please try again.";
  }
  finally
  {

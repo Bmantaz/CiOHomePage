@@ -24,7 +24,8 @@ public class AuthController(UserManager<IdentityUser> userManager, SignInManager
  {
  return BadRequest(result.Errors);
  }
- await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "BandMember"));
+ // Optionally add a default role using Identity Roles rather than raw claim
+ // await _userManager.AddToRoleAsync(user, "BandMember");
  return Ok();
  }
 
@@ -41,16 +42,20 @@ public class AuthController(UserManager<IdentityUser> userManager, SignInManager
 
  private async Task<string> GenerateJwtAsync(IdentityUser user)
  {
- var key = _config["Jwt:Key"] ?? "dev_secret_change_me";
- var issuer = _config["Jwt:Issuer"] ?? "CiOHomePage";
- var audience = _config["Jwt:Audience"] ?? "CiOHomePageClient";
+ var key = _config["Jwt:Key"] ?? throw new InvalidOperationException("Configuration 'Jwt:Key' is required.");
+ var issuer = _config["Jwt:Issuer"] ?? throw new InvalidOperationException("Configuration 'Jwt:Issuer' is required.");
+ var audience = _config["Jwt:Audience"] ?? throw new InvalidOperationException("Configuration 'Jwt:Audience' is required.");
  var creds = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), SecurityAlgorithms.HmacSha256);
  var claims = new List<Claim>
  {
  new(ClaimTypes.NameIdentifier, user.Id),
- new(ClaimTypes.Name, user.UserName ?? user.Id),
- new(ClaimTypes.Role, "BandMember")
+ new(ClaimTypes.Name, user.UserName ?? user.Id)
  };
+ var roles = await _userManager.GetRolesAsync(user);
+ foreach (var role in roles)
+ {
+ claims.Add(new Claim(ClaimTypes.Role, role));
+ }
  var token = new JwtSecurityToken(
  issuer: issuer,
  audience: audience,

@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
  public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration config)
  {
- var cs = config.GetConnectionString("Default") ?? "Data Source=app.db";
+ var cs = config.GetConnectionString("Default") ?? throw new InvalidOperationException("Connection string 'Default' is required.");
  services.AddDbContext<AppDbContext>(o => o.UseSqlite(cs));
  services.AddIdentityCore<IdentityUser>(options =>
  {
@@ -26,9 +26,10 @@ public static class ServiceCollectionExtensions
  .AddEntityFrameworkStores<AppDbContext>()
  .AddSignInManager();
 
- var key = config["Jwt:Key"] ?? "dev_secret_change_me";
- var issuer = config["Jwt:Issuer"] ?? "CiOHomePage";
- var audience = config["Jwt:Audience"] ?? "CiOHomePageClient";
+ // Require JWT settings; fail fast if missing
+ var key = config["Jwt:Key"] ?? throw new InvalidOperationException("Configuration 'Jwt:Key' is required.");
+ var issuer = config["Jwt:Issuer"] ?? throw new InvalidOperationException("Configuration 'Jwt:Issuer' is required.");
+ var audience = config["Jwt:Audience"] ?? throw new InvalidOperationException("Configuration 'Jwt:Audience' is required.");
  services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(o =>
  {

@@ -10,20 +10,25 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS (for separate client origin in development)
+// CORS (restrict to configured client origins)
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
- options.AddDefaultPolicy(policy =>
- policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+ options.AddPolicy("ClientPolicy", policy =>
+ {
+ policy.WithOrigins(allowedOrigins)
+ .AllowAnyHeader()
+ .AllowAnyMethod();
+ });
 });
 
 var app = builder.Build();
 
-// Apply database
+// Apply database migrations
 using (var scope = app.Services.CreateScope())
 {
  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
- db.Database.EnsureCreated();
+ db.Database.Migrate();
 }
 
 if (app.Environment.IsDevelopment())
@@ -33,7 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.UseCors();
+app.UseCors("ClientPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 

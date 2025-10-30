@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
  public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
  public DbSet<EventRsvp> EventRsvps => Set<EventRsvp>();
  public DbSet<MerchSale> MerchSales => Set<MerchSale>();
+ public DbSet<Gig> Gigs => Set<Gig>();
 
  protected override void OnModelCreating(ModelBuilder builder)
  {
@@ -19,5 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
  builder.Entity<EventRsvp>()
  .HasIndex(r => new { r.EventId, r.UserId })
  .IsUnique();
+ builder.Entity<Gig>()
+ .HasIndex(g => g.Date);
  }
 }
