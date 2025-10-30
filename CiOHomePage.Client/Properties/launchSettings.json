@@ -3,10 +3,10 @@
     "CiOHomePage.Client": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:5173",
+      "applicationUrl": "http://localhost:0",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ApiBaseUrl": "https://localhost:7049/"
+        "ApiBaseUrl": "http://localhost:5081/"
       }
     },
     "WSL": {

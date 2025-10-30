@@ -3,6 +3,7 @@ using CiOHomePage.Components;
 using CiOHomePage.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -64,11 +65,23 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Create DB
+// Create / update DB consistently with migrations
 using (var scope = app.Services.CreateScope())
 {
  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+ try
+ {
+ db.Database.Migrate();
+ }
+ catch (SqliteException ex) when (
+ app.Environment.IsDevelopment() &&
+ ex.SqliteErrorCode ==1 &&
+ ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase))
+ {
+ // Dev-only fallback when existing tables conflict with empty migration history
+ Console.Error.WriteLine("[Dev] Migration failed due to existing tables without migration history. Falling back to EnsureCreated().");
  db.Database.EnsureCreated();
+ }
 }
 
 if (app.Environment.IsDevelopment())
